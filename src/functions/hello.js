@@ -5,10 +5,21 @@ const activityName = 'hello';
 
 df.app.orchestration('helloOrchestrator', function* (context) {
     const outputs = [];
+    //pushing elements to the outputs like an array
     outputs.push(yield context.df.callActivity(activityName, 'Tokyo'));
     outputs.push(yield context.df.callActivity(activityName, 'Seattle'));
     outputs.push(yield context.df.callActivity(activityName, 'Cairo'));
 
+    // Wait for the external event named "GoAhead"
+    const updatedByExternalApp = yield context.df.waitForExternalEvent('GoAhead');
+
+    // You can now use the value of updatedByExternalApp in your workflow
+    if (updatedByExternalApp) {
+        outputs.push('External event received: GoAhead');
+      
+    } else {
+        outputs.push('External event received: Do not proceed');
+    }
     return outputs;
 });
 
